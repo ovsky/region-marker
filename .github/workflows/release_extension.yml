@@ -1,0 +1,85 @@
+name: Create VSIX, Release, and Artifact (on Main Push - Auto-Increment Version)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      prefix:
+        description: 'Custom prefix for the VSIX file name'
+        required: true
+        default: 'shadeview-2.0'
+
+jobs:
+  package-release-artifact:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get current date
+        id: get-date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+      - name: Set Prefix (Editable within the script)
+        id: set-prefix
+        run: |
+          PREFIX="shadeview-2-autobuild"
+          echo "prefix=$PREFIX" >> $GITHUB_OUTPUT
+
+      - name: Get Latest Tag and Handle Initial State
+        id: get-latest-tag
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Increment Version
+        id: increment-version
+        run: |
+          IFS='.' read -r -a VERSION_PARTS <<< "${{ steps.get-latest-tag.outputs.latest_tag }}"
+          MAJOR=${VERSION_PARTS[0]#v}
+          MINOR=${VERSION_PARTS[1]}
+          PATCH=${VERSION_PARTS[2]}
+          PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Create ZIP archive and Rename
+        run: |
+          zip -r "${{ steps.set-prefix.outputs.prefix }}-${{ steps.increment-version.outputs.new_version }}-${{ steps.get-date.outputs.date }}.zip" ./* -x "*.git*"
+          mv "${{ steps.set-prefix.outputs.prefix }}-${{ steps.increment-version.outputs.new_version }}-${{ steps.get-date.outputs.date }}.zip" "${{ steps.set-prefix.outputs.prefix }}-${{ steps.increment-version.outputs.new_version }}-${{ steps.get-date.outputs.date }}.vsix"
+        shell: bash
+
+      - name: Upload VSIX as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.set-prefix.outputs.prefix }}-${{ steps.increment-version.outputs.new_version }}-${{ steps.get-date.outputs.date }}.vsix
+          path: ${{ steps.set-prefix.outputs.prefix }}-${{ steps.increment-version.outputs.new_version }}-${{ steps.get-date.outputs.date }}.vsix
+          retention-days: 5
+
+      - name: Configure Git User
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Create Tag and Release (Combined)
+        run: |
+          TAG_NAME="v${{ steps.increment-version.outputs.new_version }}"
+          git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
+          git push origin "$TAG_NAME"
+
+          gh release create "$TAG_NAME" \
+            --title "Auto-build 2.0: $TAG_NAME" \
+            --notes "### **Auto-build of ShadeView 2.0** _vel. @ $(echo $TAG_NAME | sed 's/^v//')_.  <br><br> Result: `${{ steps.set-prefix.outputs.prefix }}-${{ steps.increment-version.outputs.new_version }}-${{ steps.get-date.outputs.date }}.vsix`" \
+            --draft=false \
+            --prerelease=false \
+            "${{ steps.set-prefix.outputs.prefix }}-${{ steps.increment-version.outputs.new_version }}-${{ steps.get-date.outputs.date }}.vsix"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GITHUB_TOKEN is sufficient
+        shell: bash

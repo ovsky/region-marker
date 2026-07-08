@@ -1,0 +1,49 @@
+name: Create Extension Branch
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up GitHub Actions User
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      - name: Create or update Extension Branch
+        env:
+          TARGET_FOLDER: "extension"
+          BRANCH_NAME: "extension_only"
+        run: |
+          if [ -d "$TARGET_FOLDER" ]; then
+            # Check if branch exists
+            if git show-ref --verify --quiet refs/heads/"$BRANCH_NAME"; then
+              echo "Branch '$BRANCH_NAME' exists. Checking it out."
+              git checkout "$BRANCH_NAME"
+            else
+              echo "Branch '$BRANCH_NAME' does not exist. Creating a new one."
+              git checkout --orphan "$BRANCH_NAME"
+            fi
+            # Remove all files from the branch
+            git rm -rf .
+            # Restore only the target folder
+            git checkout main -- "$TARGET_FOLDER"
+            # Unpack all files from the folder to the root and delete the folder
+            mv "$TARGET_FOLDER"/* .  # Move files from the folder to root
+            rm -rf "$TARGET_FOLDER"   # Delete the folder
+            # Commit and push (force if the branch already existed)
+            git add .
+            git commit -m "Created or updated branch '$BRANCH_NAME' from folder '$TARGET_FOLDER' and unpacked its files"
+            git push origin "$BRANCH_NAME" --force
+          else
+            echo "Folder $TARGET_FOLDER does not exist. Exiting."
+            exit 1
+          fi
