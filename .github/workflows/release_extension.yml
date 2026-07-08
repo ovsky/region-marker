@@ -9,7 +9,7 @@ on:
       prefix:
         description: 'Custom prefix for the VSIX file name'
         required: true
-        default: 'shadeview-2.0'
+        default: 'region-marker'
 
 jobs:
   package-release-artifact:
@@ -28,7 +28,7 @@ jobs:
       - name: Set Prefix (Editable within the script)
         id: set-prefix
         run: |
-          PREFIX="shadeview-2-autobuild"
+          PREFIX="region-marker-2-autobuild"
           echo "prefix=$PREFIX" >> $GITHUB_OUTPUT
 
       - name: Get Latest Tag and Handle Initial State
@@ -76,7 +76,7 @@ jobs:
 
           gh release create "$TAG_NAME" \
             --title "Auto-build 2.0: $TAG_NAME" \
-            --notes "### **Auto-build of ShadeView 2.0** _vel. @ $(echo $TAG_NAME | sed 's/^v//')_.  <br><br> Result: `${{ steps.set-prefix.outputs.prefix }}-${{ steps.increment-version.outputs.new_version }}-${{ steps.get-date.outputs.date }}.vsix`" \
+            --notes "### **Auto-build of region-marker 2.0** _vel. @ $(echo $TAG_NAME | sed 's/^v//')_.  <br><br> Result: `${{ steps.set-prefix.outputs.prefix }}-${{ steps.increment-version.outputs.new_version }}-${{ steps.get-date.outputs.date }}.vsix`" \
             --draft=false \
             --prerelease=false \
             "${{ steps.set-prefix.outputs.prefix }}-${{ steps.increment-version.outputs.new_version }}-${{ steps.get-date.outputs.date }}.vsix"
