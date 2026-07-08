@@ -28,7 +28,7 @@ jobs:
       - name: Set Prefix (Editable within the script)
         id: set-prefix
         run: |
-          PREFIX="region-marker-2-autobuild"
+          PREFIX="region-marker-autobuild"
           echo "prefix=$PREFIX" >> $GITHUB_OUTPUT
 
       - name: Get Latest Tag and Handle Initial State
