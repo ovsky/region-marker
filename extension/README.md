@@ -1,7 +1,7 @@
 # 💜 RegionMarker - The Ultimate `#region` Formatting Extension
 
-[![Build and Deploy](https://github.com/ovsky/shadeview-2.0/actions/workflows/release_extension.yml/badge.svg)](https://github.com/ovsky/shadeview-2.0/releases/latest)
-[![Deploy Branch](https://github.com/ovsky/shadeview-2.0/actions/workflows/extension_branch_workflow.yml/badge.svg)](https://github.com/ovsky/shadeview-2.0/tree/extension_only/) ![License](https://img.shields.io/badge/License-MIT-purple)
+[![Build and Deploy](https://github.com/ovsky/region-marker/actions/workflows/release_extension.yml/badge.svg)](https://github.com/ovsky/region-marker/releases/latest)
+[![Deploy Branch](https://github.com/ovsky/region-marker/actions/workflows/extension_branch_workflow.yml/badge.svg)](https://github.com/ovsky/region-marker/tree/extension_only/) ![License](https://img.shields.io/badge/License-MIT-purple)
 
 ---
 
