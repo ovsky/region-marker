@@ -2,7 +2,7 @@
   "name": "regionmarker",
   "displayName": "Region Marker",
   "description": "Simple extensions for better regions visibility.",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "publisher": "awwsky",
   "engines": {
     "vscode": "^1.75.0"

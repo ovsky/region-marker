@@ -3,7 +3,7 @@
   xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011"
   xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Language="en-US" Id="regionmarker" Version="0.3.6" Publisher="awwsky" />
+    <Identity Language="en-US" Id="regionmarker" Version="0.3.7" Publisher="awwsky" />
     <DisplayName>Region Marker</DisplayName>
     <Description xml:space="preserve">Simple extensions for better regions visiblity</Description>
     <Tags>region, marker, highlight, mark</Tags>
